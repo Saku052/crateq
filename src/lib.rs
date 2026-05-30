@@ -1,37 +1,40 @@
-use std::collections::{HashMap}; //TODO: データベースを理解するためにはこのHashMapを理解する必要がある気がする。メモリに保存するって所は理解できたけど、ちゃんとソースコードで確認するべき
+// 目的: インメモリKvStoreの構築
+// 簡単にいうと、HashMapのラッパーではある
 
+use std::{collections::HashMap};
 
-
+// 基本のHashMapのstructを定義していく
 pub struct KvStore {
-    data: HashMap<Vec<u8>, Vec<u8>>
+    data: HashMap<Vec<u8>, Vec<u8>> // TODO: HashMapの中身は確認しておくべき
 }
 
+// KvStoreの関数を作れるようにしていく
 impl KvStore {
 
-    //インスタンスの作成
+    //コンストラクタ
     pub fn new() -> Self {
         let data = HashMap::new();
         Self { data }
     }
 
     // insert
-    //　HashMap自体にものを追加したいから（可変でありたい）mut ただHashMap自体をどこか他の場所に移すわけじゃないから所有権自体はいらない
-    // 検索キーと保存するものどっちもほしよねinsertは。insertの場合はどっちも別の場所HashMapに変数を移動させたいから所有権が欲しい
+    // dataは欲しいよね、しかも追加するから可変でありたい
+    // keyもvalueも欲しい。hashmap本体の方に移したいから所有権も欲しい
     pub fn insert(&mut self, key: Vec<u8>, value: Vec<u8>) {
         self.data.insert(key, value);
     }
 
     // delete
-    // HashMap自体に影響は与えるものではあるが、HashMap自体を別の場所に移動させたいわけではないから&はつける（&つけなかったら所有権も来ちゃうからね）
-    // key valueに関しては、deleteするのにそもそもvalueはいらない。keyだけ欲しくて、しかも移動させるわけではないから、所有権はいらない、参照も一応したいけど、可変である必要もない。
-    pub fn delete(&mut self, key: &Vec<u8>) {
+    // dataの変更権がほしい
+    // keyだけでいいね。keyは参照だけでいいし、変更もしない。
+    pub fn delete(&mut self, key: &[u8]) {
         self.data.remove(key);
     }
-    
+
     // get
-    // HashMap自体に変更は加えない。単純に使い方から参照が欲しいだけか。hashmapに対して関数を呼んではいるが、影響を与えているものではないため、mutをつけるかは疑問
-    // keyだけで良くて、単純に値が欲しいだけだから、所有権はいらないし、編集も別にしないからmutもいらないか
-    pub fn get(&self, key: &Vec<u8>) -> Option<&Vec<u8>> {
-        self.data.get(key)
+    // data自体に変更は加えないし、他の場所に移したりもしない
+    // keyだけでいいね。keyも参照だけで良くて、変更もしない
+    pub fn get(&self, key: &[u8]) -> Option<&[u8]> {
+        self.data.get(key).map(|v| v.as_slice())
     }
 }
