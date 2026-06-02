@@ -27,8 +27,8 @@ impl KvStore {
     // delete
     // dataの変更権がほしい
     // keyだけでいいね。keyは参照だけでいいし、変更もしない。
-    pub fn delete(&mut self, key: &[u8]) {
-        self.data.remove(key);  //TODO: 削除できたことをreturnするべき
+    pub fn delete(&mut self, key: &[u8]) -> Option<Vec<u8>> {
+        self.data.remove(key) //TODO: 削除できたことをreturnするべき
     }
 
     // get
@@ -46,4 +46,19 @@ fn set_and_get () {
 
     kvstore.insert(b"key".to_vec(), b"value".to_vec());
     assert_eq!(kvstore.get(b"key"), Some(b"value".as_slice()));
+}
+
+#[test]
+fn check_delete() {
+    let mut store = KvStore::new();
+
+    let key = b"key";
+    let value = b"value";
+
+    store.insert(key.to_vec(), value.to_vec());
+
+    let delete_output: Vec<u8>;
+    delete_output = store.delete(key).unwrap();
+
+    assert_eq!(delete_output, value.to_vec());
 }
