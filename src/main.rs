@@ -1,4 +1,4 @@
-use crateq::KvStore;
+use crateq::store::KvStore;
 use std::str::from_utf8;
 
 fn main() {
